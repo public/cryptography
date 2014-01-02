@@ -36,4 +36,11 @@ You'll also need to generate your own ``openssl.ld`` file. For example::
 You should replace the version string on the first line as appropriate for your
 build.
 
+If you are building a customised version of OpenSSL that has the same ELF
+SONAME attribute (you can find this with ``readelf -d``) as the one used by
+Python, you'll probably want to make sure that your build doesn't have the same
+one. One way to do this is by modifying ``crypto/opensslv.h`` to use custom
+version number. We recomended something like ``0.0.101`` instead of
+incrementing any of the other versions. 
+
 .. _`OpenSSL`: https://www.openssl.org/
