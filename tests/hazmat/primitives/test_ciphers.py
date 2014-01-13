@@ -32,9 +32,30 @@ class TestAES(object):
         cipher = AES(binascii.unhexlify(key))
         assert cipher.key_size == keysize
 
+        cipher = AES(key_size=keysize)
+        assert cipher.key_size == keysize
+
+        with pytest.raises(AttributeError):
+            cipher.key
+
+        cipher = AES(binascii.unhexlify(key), keysize)
+        assert cipher.key_size == keysize
+
     def test_invalid_key_size(self):
         with pytest.raises(ValueError):
             AES(binascii.unhexlify(b"0" * 12))
+
+        with pytest.raises(ValueError):
+            AES(key_size=92)
+
+        with pytest.raises(ValueError):
+            AES(binascii.unhexlify(b"0" * 12), key_size=128)
+
+        with pytest.raises(ValueError):
+            AES(binascii.unhexlify(b"0" * 32), key_size=92)
+
+        with pytest.raises(TypeError):
+            AES()
 
 
 class TestCamellia(object):
@@ -47,9 +68,30 @@ class TestCamellia(object):
         cipher = Camellia(binascii.unhexlify(key))
         assert cipher.key_size == keysize
 
+        cipher = Camellia(key_size=keysize)
+        assert cipher.key_size == keysize
+
+        with pytest.raises(AttributeError):
+            cipher.key
+
+        cipher = Camellia(binascii.unhexlify(key), keysize)
+        assert cipher.key_size == keysize
+
     def test_invalid_key_size(self):
         with pytest.raises(ValueError):
             Camellia(binascii.unhexlify(b"0" * 12))
+
+        with pytest.raises(ValueError):
+            Camellia(key_size=92)
+
+        with pytest.raises(ValueError):
+            Camellia(binascii.unhexlify(b"0" * 12), key_size=128)
+
+        with pytest.raises(ValueError):
+            Camellia(binascii.unhexlify(b"0" * 32), key_size=92)
+
+        with pytest.raises(TypeError):
+            Camellia()
 
 
 class TestTripleDES(object):
@@ -62,9 +104,30 @@ class TestTripleDES(object):
         cipher = TripleDES(binascii.unhexlify(key))
         assert cipher.key_size == 192
 
+        cipher = TripleDES(key_size=192)
+        assert cipher.key_size == 192
+
+        with pytest.raises(AttributeError):
+            cipher.key
+
+        cipher = TripleDES(binascii.unhexlify(key), 192)
+        assert cipher.key_size == 192
+
     def test_invalid_key_size(self):
         with pytest.raises(ValueError):
             TripleDES(binascii.unhexlify(b"0" * 12))
+
+        with pytest.raises(ValueError):
+            TripleDES(key_size=92)
+
+        with pytest.raises(ValueError):
+            TripleDES(binascii.unhexlify(b"0" * 12), key_size=128)
+
+        with pytest.raises(ValueError):
+            TripleDES(binascii.unhexlify(b"0" * 32), key_size=92)
+
+        with pytest.raises(TypeError):
+            TripleDES()
 
 
 class TestBlowfish(object):
@@ -75,9 +138,30 @@ class TestBlowfish(object):
         cipher = Blowfish(binascii.unhexlify(key))
         assert cipher.key_size == keysize
 
+        cipher = Blowfish(key_size=keysize)
+        assert cipher.key_size == keysize
+
+        with pytest.raises(AttributeError):
+            cipher.key
+
+        cipher = Blowfish(binascii.unhexlify(key), keysize)
+        assert cipher.key_size == keysize
+
     def test_invalid_key_size(self):
         with pytest.raises(ValueError):
             Blowfish(binascii.unhexlify(b"0" * 6))
+
+        with pytest.raises(ValueError):
+            Blowfish(key_size=42)
+
+        with pytest.raises(ValueError):
+            Blowfish(binascii.unhexlify(b"0" * 6), key_size=128)
+
+        with pytest.raises(ValueError):
+            Blowfish(binascii.unhexlify(b"0" * 32), key_size=48)
+
+        with pytest.raises(TypeError):
+            Blowfish()
 
 
 class TestARC4(object):
@@ -94,6 +178,27 @@ class TestARC4(object):
         cipher = ARC4(binascii.unhexlify(key))
         assert cipher.key_size == keysize
 
+        cipher = ARC4(key_size=keysize)
+        assert cipher.key_size == keysize
+
+        with pytest.raises(AttributeError):
+            cipher.key
+
+        cipher = ARC4(binascii.unhexlify(key), keysize)
+        assert cipher.key_size == keysize
+
     def test_invalid_key_size(self):
         with pytest.raises(ValueError):
             ARC4(binascii.unhexlify(b"0" * 34))
+
+        with pytest.raises(ValueError):
+            ARC4(key_size=48)
+
+        with pytest.raises(ValueError):
+            ARC4(binascii.unhexlify(b"0" * 6), key_size=128)
+
+        with pytest.raises(ValueError):
+            ARC4(binascii.unhexlify(b"0" * 32), key_size=48)
+
+        with pytest.raises(TypeError):
+            ARC4()

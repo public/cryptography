@@ -17,13 +17,41 @@ from cryptography import utils
 from cryptography.hazmat.primitives import interfaces
 
 
-def _verify_key_size(algorithm, key):
-    # Verify that the key size matches the expected key size
-    if len(key) * 8 not in algorithm.key_sizes:
+def _valid_key_size(algorithm, key_size):
+    if key_size not in algorithm.key_sizes:
         raise ValueError("Invalid key size ({0}) for {1}".format(
-            len(key) * 8, algorithm.name
+            key_size, algorithm.name
         ))
-    return key
+
+
+def _init_algorithm(algorithm, key, key_size):
+    """
+    Ciphers may have eith key, key_size or both specified on __init__.
+
+    len(key) * 8 must be equal to key_size if both are set.
+
+    Both must be contained in algorithm.key_sizes
+    """
+    if key_size is None and key is None:
+        raise TypeError(
+            "__init__ takes at least one of key and key_size"
+        )
+
+    if key_size is not None:
+        _valid_key_size(algorithm, key_size)
+        algorithm._key_size = key_size
+
+    if key is not None:
+        key_bits = len(key) * 8
+
+        if key_size is not None and key_bits != key_size:
+            raise ValueError("Key size {0} does not match {1}".format(
+                key_bits, key_size
+            ))
+        else:
+            _valid_key_size(algorithm, key_bits)
+            algorithm._key_size = key_bits
+        algorithm._key = key
 
 
 @utils.register_interface(interfaces.BlockCipherAlgorithm)
@@ -33,12 +61,16 @@ class AES(object):
     block_size = 128
     key_sizes = frozenset([128, 192, 256])
 
-    def __init__(self, key):
-        self.key = _verify_key_size(self, key)
+    def __init__(self, key=None, key_size=None):
+        _init_algorithm(self, key, key_size)
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def key_size(self):
-        return len(self.key) * 8
+        return self._key_size
 
 
 @utils.register_interface(interfaces.BlockCipherAlgorithm)
@@ -48,12 +80,16 @@ class Camellia(object):
     block_size = 128
     key_sizes = frozenset([128, 192, 256])
 
-    def __init__(self, key):
-        self.key = _verify_key_size(self, key)
+    def __init__(self, key=None, key_size=None):
+        _init_algorithm(self, key, key_size)
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def key_size(self):
-        return len(self.key) * 8
+        return self._key_size
 
 
 @utils.register_interface(interfaces.BlockCipherAlgorithm)
@@ -63,16 +99,22 @@ class TripleDES(object):
     block_size = 64
     key_sizes = frozenset([64, 128, 192])
 
-    def __init__(self, key):
-        if len(key) == 8:
-            key += key + key
-        elif len(key) == 16:
-            key += key[:8]
-        self.key = _verify_key_size(self, key)
+    def __init__(self, key=None, key_size=None):
+        if key is not None:
+            if len(key) == 8:
+                key += key + key
+            elif len(key) == 16:
+                key += key[:8]
+
+        _init_algorithm(self, key, key_size)
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def key_size(self):
-        return len(self.key) * 8
+        return self._key_size
 
 
 @utils.register_interface(interfaces.BlockCipherAlgorithm)
@@ -82,12 +124,16 @@ class Blowfish(object):
     block_size = 64
     key_sizes = frozenset(range(32, 449, 8))
 
-    def __init__(self, key):
-        self.key = _verify_key_size(self, key)
+    def __init__(self, key=None, key_size=None):
+        _init_algorithm(self, key, key_size)
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def key_size(self):
-        return len(self.key) * 8
+        return self._key_size
 
 
 @utils.register_interface(interfaces.CipherAlgorithm)
@@ -95,9 +141,13 @@ class ARC4(object):
     name = "RC4"
     key_sizes = frozenset([40, 56, 64, 80, 128, 192, 256])
 
-    def __init__(self, key):
-        self.key = _verify_key_size(self, key)
+    def __init__(self, key=None, key_size=None):
+        _init_algorithm(self, key, key_size)
+
+    @property
+    def key(self):
+        return self._key
 
     @property
     def key_size(self):
-        return len(self.key) * 8
+        return self._key_size
