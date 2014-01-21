@@ -93,31 +93,35 @@ class Binding(object):
         # OpenSSL is the only binding so for now it must always be available
         return True
 
-    def init_static_locks(self):
-        with Binding._lock_init_lock:
+    @classmethod
+    def init_static_locks(cls):
+        with cls._lock_init_lock:
+            cls._ensure_ffi_initialized()
+
             # use Python's implementation if available
             __import__("_ssl")
 
-            if self.lib.CRYPTO_get_locking_callback() != self.ffi.NULL:
+            if cls.lib.CRYPTO_get_locking_callback() != cls.ffi.NULL:
                 return
 
             # otherwise setup our version
-            num_locks = self.lib.CRYPTO_num_locks()
-            Binding._locks = [threading.Lock()
-                              for n in range(num_locks)]
+            num_locks = cls.lib.CRYPTO_num_locks()
+            cls._locks = [threading.Lock()
+                          for n in range(num_locks)]
 
-            self._lock_cb_handle = self.ffi.callback(
+            cls._lock_cb_handle = cls.ffi.callback(
                 "void(int, int, const char *, int)",
-                self._lock_cb
+                cls._lock_cb
             )
-            self.lib.CRYPTO_set_locking_callback(self._lock_cb_handle)
+            cls.lib.CRYPTO_set_locking_callback(cls._lock_cb_handle)
 
-    def _lock_cb(self, mode, n, file, line):
-        lock = Binding._locks[n]
+    @classmethod
+    def _lock_cb(cls, mode, n, file, line):
+        lock = cls._locks[n]
 
-        if mode & self.lib.CRYPTO_LOCK:
+        if mode & cls.lib.CRYPTO_LOCK:
             lock.acquire()
-        elif mode & self.lib.CRYPTO_UNLOCK:
+        elif mode & cls.lib.CRYPTO_UNLOCK:
             lock.release()
         else:
             raise RuntimeError("Unknown lock mode {0}".format(mode))
