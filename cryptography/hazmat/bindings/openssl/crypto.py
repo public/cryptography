@@ -27,6 +27,8 @@ static const int CRYPTO_MEM_CHECK_ON;
 static const int CRYPTO_MEM_CHECK_OFF;
 static const int CRYPTO_MEM_CHECK_ENABLE;
 static const int CRYPTO_MEM_CHECK_DISABLE;
+static const int CRYPTO_LOCK;
+static const int CRYPTO_UNLOCK;
 """
 
 FUNCTIONS = """
@@ -51,7 +53,6 @@ MACROS = """
 void CRYPTO_add(int *, int, int);
 void CRYPTO_malloc_init(void);
 void CRYPTO_malloc_debug_init(void);
-
 """
 
 CUSTOMIZATIONS = """

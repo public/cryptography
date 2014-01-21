@@ -13,6 +13,8 @@
 
 from __future__ import absolute_import, division, print_function
 
+import threading
+
 from cryptography.hazmat.bindings.utils import build_ffi
 
 
@@ -67,6 +69,10 @@ class Binding(object):
         "x509v3",
     ]
 
+    _locks = None
+    _lock_cb_handle = None
+    _lock_init_lock = threading.Lock()
+
     ffi = None
     lib = None
 
@@ -86,3 +92,32 @@ class Binding(object):
     def is_available(cls):
         # OpenSSL is the only binding so for now it must always be available
         return True
+
+    def init_static_locks(self):
+        with Binding._lock_init_lock:
+            # use Python's implementation if available
+            __import__("_ssl")
+
+            if self.lib.CRYPTO_get_locking_callback() != self.ffi.NULL:
+                return
+
+            # otherwise setup our version
+            num_locks = self.lib.CRYPTO_num_locks()
+            Binding._locks = [threading.Lock()
+                              for n in range(num_locks)]
+
+            self._lock_cb_handle = self.ffi.callback(
+                "void(int, int, const char *, int)",
+                self._lock_cb
+            )
+            self.lib.CRYPTO_set_locking_callback(self._lock_cb_handle)
+
+    def _lock_cb(self, mode, n, file, line):
+        lock = Binding._locks[n]
+
+        if mode & self.lib.CRYPTO_LOCK:
+            lock.acquire()
+        elif mode & self.lib.CRYPTO_UNLOCK:
+            lock.release()
+        else:
+            raise RuntimeError("Unknown lock mode {0}".format(mode))
