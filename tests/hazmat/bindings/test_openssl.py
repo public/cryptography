@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import threading
+import time
 
 from cryptography.hazmat.bindings.openssl.binding import Binding
 
@@ -32,21 +33,37 @@ class TestOpenSSL(object):
         lock_cb = b.lib.CRYPTO_get_locking_callback()
         assert lock_cb != b.ffi.NULL
 
-    def test_threads(self):
+    def test_crypto_lock(self):
         b = Binding()
         b.init_static_locks()
 
-        def randloop():
-            s = b.ffi.new("char[]", 256)
-            sb = b.ffi.buffer(s)
-            sb[:] = b"\0" * 256
+        self._shared_value = 0
 
-            for i in range(100000):
-                b.lib.RAND_seed(s, 256)
+        def critical_loop():
+            for i in range(10):
+                b.lib.CRYPTO_lock(
+                    b.lib.CRYPTO_LOCK | b.lib.CRYPTO_READ,
+                    b.lib.CRYPTO_LOCK_SSL,
+                    b.ffi.NULL,
+                    0
+                )
+
+                assert self._shared_value == 0
+                self._shared_value += 1
+                time.sleep(0.01)
+                assert self._shared_value == 1
+                self._shared_value = 0
+
+                b.lib.CRYPTO_lock(
+                    b.lib.CRYPTO_UNLOCK | b.lib.CRYPTO_READ,
+                    b.lib.CRYPTO_LOCK_SSL,
+                    b.ffi.NULL,
+                    0
+                )
 
         threads = []
-        for x in range(3):
-            t = threading.Thread(target=randloop)
+        for x in range(10):
+            t = threading.Thread(target=critical_loop)
             t.daemon = True
             t.start()
 
@@ -55,5 +72,5 @@ class TestOpenSSL(object):
         while threads:
             for t in threads:
                 t.join(0.1)
-                if not t.isAlive():
+                if not t.is_alive():
                     threads.remove(t)

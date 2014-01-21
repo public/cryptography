@@ -29,6 +29,9 @@ static const int CRYPTO_MEM_CHECK_ENABLE;
 static const int CRYPTO_MEM_CHECK_DISABLE;
 static const int CRYPTO_LOCK;
 static const int CRYPTO_UNLOCK;
+static const int CRYPTO_READ;
+static const int CRYPTO_WRITE;
+static const int CRYPTO_LOCK_SSL;
 """
 
 FUNCTIONS = """
@@ -45,6 +48,7 @@ void CRYPTO_set_locking_callback(void(*)(int, int, const char *, int));
 void CRYPTO_set_id_callback(unsigned long (*)(void));
 unsigned long (*CRYPTO_get_id_callback(void))(void);
 void (*CRYPTO_get_locking_callback(void))(int, int, const char *, int);
+void CRYPTO_lock(int, int, const char *, int);
 
 void OPENSSL_free(void *);
 """
