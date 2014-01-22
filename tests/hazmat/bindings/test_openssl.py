@@ -79,6 +79,9 @@ class TestOpenSSL(object):
             0
         )
 
+        lock.acquire(False)
+        lock.release()
+
         out, err = capfd.readouterr()
         assert "RuntimeError: Unknown lock mode" in err
 
