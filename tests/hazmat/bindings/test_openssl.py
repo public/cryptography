@@ -45,6 +45,10 @@ class TestOpenSSL(object):
         # check that the lock state changes appropriately
         lock = b._locks[b.lib.CRYPTO_LOCK_SSL]
 
+        assert lock.acquire(False)
+
+        lock.release()
+
         b.lib.CRYPTO_lock(
             b.lib.CRYPTO_LOCK | b.lib.CRYPTO_READ,
             b.lib.CRYPTO_LOCK_SSL,
@@ -63,14 +67,14 @@ class TestOpenSSL(object):
 
         assert lock.acquire(False)
 
-        # clean up state
         lock.release()
-        Binding._lock_cb_handle = old_cb
-        b.lib.CRYPTO_set_locking_callback(old_cb)
 
     def test_crypto_lock_mutex(self):
         b = Binding()
         b.init_static_locks()
+
+        # make sure whatever locking system we end up with actually acts
+        # like a mutex.
 
         self._shared_value = 0
 
