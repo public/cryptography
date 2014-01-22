@@ -71,7 +71,6 @@ class Binding(object):
 
     _locks = None
     _lock_cb_handle = None
-    _original_lock_cb_handle = None
     _lock_init_lock = threading.Lock()
 
     ffi = None
@@ -99,23 +98,21 @@ class Binding(object):
         with cls._lock_init_lock:
             cls._ensure_ffi_initialized()
 
+            cls._lock_cb_handle = cls.ffi.callback(
+                "void(int, int, const char *, int)",
+                cls._lock_cb
+            )
+
             # use Python's implementation if available
             __import__("_ssl")
 
-            old_cb = cls.lib.CRYPTO_get_locking_callback()
-            if old_cb != cls.ffi.NULL:
-                cls._original_lock_cb_handle = old_cb
+            if cls.lib.CRYPTO_get_locking_callback() != cls.ffi.NULL:
                 return
 
             # otherwise setup our version
             num_locks = cls.lib.CRYPTO_num_locks()
             cls._locks = [threading.Lock()
                           for n in range(num_locks)]
-
-            cls._lock_cb_handle = cls.ffi.callback(
-                "void(int, int, const char *, int)",
-                cls._lock_cb
-            )
             cls.lib.CRYPTO_set_locking_callback(cls._lock_cb_handle)
 
     @classmethod

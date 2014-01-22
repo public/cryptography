@@ -14,6 +14,8 @@
 import threading
 import time
 
+import pytest
+
 from cryptography.hazmat.bindings.openssl.binding import Binding
 
 
@@ -27,20 +29,20 @@ class TestOpenSSL(object):
     def test_is_available(self):
         assert Binding.is_available() is True
 
-    def test_thread_init(self):
+    def test_lock_init(self):
         b = Binding()
         b.init_static_locks()
         lock_cb = b.lib.CRYPTO_get_locking_callback()
         assert lock_cb != b.ffi.NULL
 
-    def test_crypto_lock_state(self):
-        # force use of our locking implementation
-        __import__("_ssl")
-
+    def test_our_crypto_lock_state(self, capfd):
         b = Binding()
-        old_cb = b.lib.CRYPTO_get_locking_callback()
-        b.lib.CRYPTO_set_locking_callback(b.ffi.NULL)
         b.init_static_locks()
+
+        # only run this test if we are using our locking cb
+        original_cb = b.lib.CRYPTO_get_locking_callback()
+        if original_cb != b._lock_cb_handle:
+            pytest.skip()
 
         # check that the lock state changes appropriately
         lock = b._locks[b.lib.CRYPTO_LOCK_SSL]
@@ -66,12 +68,19 @@ class TestOpenSSL(object):
         )
 
         assert lock.acquire(False)
-
-        # clean up state
         lock.release()
-        if old_cb != b.ffi.NULL:
-            Binding._original_lock_cb_handle = old_cb
-            b.lib.CRYPTO_set_locking_callback(old_cb)
+
+        # force the error path to run.
+
+        b.lib.CRYPTO_lock(
+            0,
+            b.lib.CRYPTO_LOCK_SSL,
+            b.ffi.NULL,
+            0
+        )
+
+        out, err = capfd.readouterr()
+        assert "RuntimeError: Unknown lock mode" in err
 
     def test_crypto_lock_mutex(self):
         b = Binding()
