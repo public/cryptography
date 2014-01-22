@@ -65,6 +65,7 @@ class TestOpenSSL(object):
 
         # clean up state
         lock.release()
+        Binding._lock_cb_handle = old_cb
         b.lib.CRYPTO_set_locking_callback(old_cb)
 
     def test_crypto_lock_mutex(self):
