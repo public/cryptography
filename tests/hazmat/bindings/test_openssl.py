@@ -67,7 +67,11 @@ class TestOpenSSL(object):
 
         assert lock.acquire(False)
 
+        # clean up state
         lock.release()
+        if old_cb != b.ffi.NULL:
+            Binding._original_lock_cb_handle = old_cb
+            b.lib.CRYPTO_set_locking_callback(old_cb)
 
     def test_crypto_lock_mutex(self):
         b = Binding()

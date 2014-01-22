@@ -71,6 +71,7 @@ class Binding(object):
 
     _locks = None
     _lock_cb_handle = None
+    _original_lock_cb_handle = None
     _lock_init_lock = threading.Lock()
 
     ffi = None
@@ -101,7 +102,9 @@ class Binding(object):
             # use Python's implementation if available
             __import__("_ssl")
 
-            if cls.lib.CRYPTO_get_locking_callback() != cls.ffi.NULL:
+            old_cb = cls.lib.CRYPTO_get_locking_callback()
+            if old_cb != cls.ffi.NULL:
+                cls._original_lock_cb_handle = old_cb
                 return
 
             # otherwise setup our version
