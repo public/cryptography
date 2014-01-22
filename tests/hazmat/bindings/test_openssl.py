@@ -29,20 +29,20 @@ class TestOpenSSL(object):
     def test_is_available(self):
         assert Binding.is_available() is True
 
-    def test_lock_init(self):
+    def test_crypto_lock_init(self):
         b = Binding()
         b.init_static_locks()
         lock_cb = b.lib.CRYPTO_get_locking_callback()
         assert lock_cb != b.ffi.NULL
 
-    def test_our_crypto_lock_state(self, capfd):
+    def test_our_crypto_lock(self, capfd):
         b = Binding()
         b.init_static_locks()
 
         # only run this test if we are using our locking cb
         original_cb = b.lib.CRYPTO_get_locking_callback()
         if original_cb != b._lock_cb_handle:
-            pytest.skip()
+            pytest.skip("Not using Python locking callback implementation")
 
         # check that the lock state changes appropriately
         lock = b._locks[b.lib.CRYPTO_LOCK_SSL]
