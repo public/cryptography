@@ -90,3 +90,19 @@ class RSABackend(six.with_metaclass(abc.ABCMeta)):
         Generate an RSAPrivateKey instance with public_exponent and a modulus
         of key_size bits.
         """
+
+
+class OpenSSLSerialisationBackend(six.with_metaclass(abc.ABCMeta)):
+    @abc.abstractmethod
+    def load_pem_private_key(data, password, backend):
+        """
+        Load a private key from PEM encoded data, using password if the data
+        is encrypted.
+        """
+
+    @abs.abstractmethod
+    def dump_pem_private_key(private_key, algorithm, mode, kdf, password):
+        """
+        Dump private_key to a PEM encoded bytes string. Encrypted with
+        algorithm in mode using a key derived from password using kdf.
+        """

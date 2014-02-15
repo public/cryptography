@@ -210,6 +210,38 @@ Asymmetric Interfaces
         The public exponent. Alias for :attr:`public_exponent`.
 
 
+.. class:: OpenSSLPrivateKey
+
+    .. versionadded:: 0.2
+
+    A serialised private key.
+
+    .. attribute:: private_key
+
+    .. method:: load_pem(data, password)
+
+        :param bytes data: The serialised data.
+
+        :param bytes password: The password to use when decrypting the
+            serialised data.
+
+    .. method:: dump_pem(algorithm, mode, kdf, password)
+
+        :param algorithm: A
+            :class:`~cryptography.hazmat.primitives.interfaces.CipherAlgorithm`
+           provider to encrypt the private key with.
+
+        :param mode: A
+            :class:`~cryptography.hazmat.primitives.interfaces.Mode` for the
+            ``algorithm``.
+
+        :param kdf: A
+            :class:`~cryptography.hazmat.primitives.interfaces.KeyDerivationFunction`
+            provider to derive the encryption key from the password with.
+
+        :return bytes: The PEM encoded private key.
+
+
 Hash Algorithms
 ~~~~~~~~~~~~~~~
 

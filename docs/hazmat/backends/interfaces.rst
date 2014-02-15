@@ -212,3 +212,50 @@ A specific ``backend`` may provide one or more of these interfaces.
             provider.
 
         :raises ValueError: If the public_exponent is not valid.
+
+
+.. class:: OpenSSLSerialisationBackend
+
+    .. versionadded:: 0.2
+
+    A backend with methods for working with OpenSSL's "traditional" PKCS #1
+    style key serialisation.
+
+    .. method:: load_pem_private_key(data, password)
+       
+        :param bytes data: PEM data to unserialise.
+
+        :param bytes password: The password to use if this data is encrypted.
+            Should be None if the data is not encrypted.
+
+        :return: A new instance of a
+            :class:`~cryptography.hazmat.primitives.interfaces.OpenSSLPrivateKey`
+            provider.
+
+        :raises ValueError: If the data could not be unserialised correctly.
+
+        :raises cryptography.exceptions.UnsupportedAlgorithm: If the data is
+            encrypted with an unsupported algorithm.
+
+    .. method:: dump_pem_private_key(key, algorithm, mode, kdf, password)
+
+        :param key: The private key object to encode.
+
+        :param algorithm: A
+            :class:`~cryptography.hazmat.primitives.interfaces.CipherAlgorithm`
+           provider to encrypt the private key with.
+
+        :param mode: A
+            :class:`~cryptography.hazmat.primitives.interfaces.Mode` for the
+            ``algorithm``.
+
+        :param kdf: A
+            :class:`~cryptography.hazmat.primitives.interfaces.KeyDerivationFunction`
+            provider to derive the encryption key from the password with.
+
+        :param bytes password: The password to encrypt the key with.
+
+        :return bytes: The PEM encoded private key.
+
+        :raises cryptography.exceptions.UnsupportedAlgorithm: If the ``kdf``,
+            ``algorithm``, or ``mode`` parameters are incompatible.
