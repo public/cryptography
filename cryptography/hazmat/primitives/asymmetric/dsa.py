@@ -28,15 +28,15 @@ def _bit_length(x):
         return len(bin(x)) - (2 + (x <= 0))
 
 
-@utils.register_interface(interfaces.DSAParams)
-class DSAParams(object):
+@utils.register_interface(interfaces.DSAParameters)
+class DSAParameters(object):
     def __init__(self, modulus, subgroup_order, generator):
         if (
             not isinstance(modulus, six.integer_types) or
             not isinstance(subgroup_order, six.integer_types) or
             not isinstance(generator, six.integer_types)
         ):
-            raise TypeError("DSAParams arguments must be integers")
+            raise TypeError("DSAParameters arguments must be integers")
 
         if _bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
@@ -148,7 +148,8 @@ class DSAPrivateKey(object):
         return self._y
 
     def parameters(self):
-        return DSAParams(self._modulus, self._subgroup_order, self._generator)
+        return DSAParameters(self._modulus, self._subgroup_order,
+                             self._generator)
 
 
 @utils.register_interface(interfaces.DSAPublicKey)
@@ -160,7 +161,7 @@ class DSAPublicKey(object):
             not isinstance(generator, six.integer_types) or
             not isinstance(y, six.integer_types)
         ):
-            raise TypeError("DSAParams arguments must be integers")
+            raise TypeError("DSAParameters arguments must be integers")
 
         if _bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
@@ -191,4 +192,5 @@ class DSAPublicKey(object):
         return self._y
 
     def parameters(self):
-        return DSAParams(self._modulus, self._subgroup_order, self._generator)
+        return DSAParameters(self._modulus, self._subgroup_order,
+                             self._generator)
