@@ -13,19 +13,10 @@
 
 from __future__ import absolute_import, division, print_function
 
-import sys
-
 import six
 
 from cryptography import utils
 from cryptography.hazmat.primitives import interfaces
-
-
-def _bit_length(x):
-    if sys.version_info >= (2, 7):
-        return x.bit_length()
-    else:
-        return len(bin(x)) - (2 + (x <= 0))
 
 
 @utils.register_interface(interfaces.DSAParameters)
@@ -38,15 +29,16 @@ class DSAParameters(object):
         ):
             raise TypeError("DSAParameters arguments must be integers")
 
-        if _bit_length(modulus) not in [1024, 2048, 3072]:
+        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if _bit_length(subgroup_order) not in [160, 224, 256]:
+        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
             raise ValueError("Subgroup order length must be 160 or 224 or"
                              "256 bits")
 
-        if (_bit_length(modulus), _bit_length(subgroup_order)) not in [
+        if (utils.bit_length(modulus),
+            utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
@@ -102,15 +94,16 @@ class DSAPrivateKey(object):
         ):
             raise TypeError("DSAPrivateKey arguments must be integers")
 
-        if _bit_length(modulus) not in [1024, 2048, 3072]:
+        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if _bit_length(subgroup_order) not in [160, 224, 256]:
+        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
             raise ValueError("Subgroup order length must be 160 or 224 or"
                              "256 bits")
 
-        if (_bit_length(modulus), _bit_length(subgroup_order)) not in [
+        if (utils.bit_length(modulus),
+            utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
@@ -133,7 +126,7 @@ class DSAPrivateKey(object):
 
     @property
     def key_size(self):
-        return _bit_length(self._modulus)
+        return utils.bit_length(self._modulus)
 
     def public_key(self):
         return DSAPublicKey(self._modulus, self._subgroup_order,
@@ -163,15 +156,16 @@ class DSAPublicKey(object):
         ):
             raise TypeError("DSAParameters arguments must be integers")
 
-        if _bit_length(modulus) not in [1024, 2048, 3072]:
+        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if _bit_length(subgroup_order) not in [160, 224, 256]:
+        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
             raise ValueError("Subgroup order length must be 160 or 224 or"
                              "256 bits")
 
-        if (_bit_length(modulus), _bit_length(subgroup_order)) not in [
+        if (utils.bit_length(modulus),
+            utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
