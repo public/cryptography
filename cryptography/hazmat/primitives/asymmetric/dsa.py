@@ -38,13 +38,10 @@ class DSAParams(object):
         ):
             raise TypeError("DSAParams arguments must be integers")
 
-        # OpenSSL 1.0.1f supports 512, 1024, 2048, 3072
-        # OpenSSL 0.9.8 supports 512, 1024
         if _bit_length(modulus) not in [1024, 2048, 3072]:
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
-        # OpenSSL 1.0.1f supports 160, 256
-        # OpenSSL 0.9.8 supports 160
+
         if _bit_length(subgroup_order) not in [160, 224, 256]:
             raise ValueError("Subgroup order length must be 160 or 224 or"
                              "256 bits")
@@ -57,11 +54,8 @@ class DSAParams(object):
                              "one of these pairs (1024, 160) or(2048, 256)"
                              "or (3072, 256)")
 
-        if generator <= 1:
-            raise ValueError("Generator must be > 1")
-
-        if generator >= modulus:
-            raise ValueError("Generator must be < Prime Modulus")
+        if generator <= 1 or generator >= modulus:
+            raise ValueError("Generator must be > 1 and < Prime Modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -124,11 +118,8 @@ class DSAPrivateKey(object):
                              "one of these pairs (1024, 160) or(2048, 256)"
                              "or (3072, 256)")
 
-        if generator <= 1:
-            raise ValueError("Generator must be > 1")
-
-        if generator >= modulus:
-            raise ValueError("Generator must be < Prime Modulus")
+        if generator <= 1 or generator >= modulus:
+            raise ValueError("Generator must be > 1 and < Prime Modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -187,11 +178,8 @@ class DSAPublicKey(object):
                              "one of these pairs (1024, 160) or(2048, 256)"
                              "or (3072, 256)")
 
-        if generator <= 1:
-            raise ValueError("Generator must be > 1")
-
-        if generator >= modulus:
-            raise ValueError("Generator must be < Prime Modulus")
+        if generator <= 1 or generator >= modulus:
+            raise ValueError("Generator must be > 1 and < Prime Modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
