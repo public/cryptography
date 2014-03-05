@@ -33,8 +33,8 @@ class DSAParameters(object):
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
-            raise ValueError("Subgroup order length must be 160 or 224 or"
+        if utils.bit_length(subgroup_order) not in [160, 256]:
+            raise ValueError("Subgroup order length must be 160 or"
                              "256 bits")
 
         if (utils.bit_length(modulus),
@@ -98,8 +98,8 @@ class DSAPrivateKey(object):
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
-            raise ValueError("Subgroup order length must be 160 or 224 or"
+        if utils.bit_length(subgroup_order) not in [160, 256]:
+            raise ValueError("Subgroup order length must be 160 or"
                              "256 bits")
 
         if (utils.bit_length(modulus),
@@ -160,8 +160,8 @@ class DSAPublicKey(object):
             raise ValueError("Prime Modulus length must be 1024 or 2048 or"
                              "3072 bits")
 
-        if utils.bit_length(subgroup_order) not in [160, 224, 256]:
-            raise ValueError("Subgroup order length must be 160 or 224 or"
+        if utils.bit_length(subgroup_order) not in [160, 256]:
+            raise ValueError("Subgroup order length must be 160 or"
                              "256 bits")
 
         if (utils.bit_length(modulus),
