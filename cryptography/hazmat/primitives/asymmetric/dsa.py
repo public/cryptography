@@ -34,12 +34,12 @@ class DSAParameters(object):
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)):
-            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+            raise ValueError("modulus and subgroup_order lengths must be "
                              "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
-            raise ValueError("Generator must be > 1 and < Prime Modulus")
+            raise ValueError("generator must be > 1 and < modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -87,12 +87,12 @@ class DSAPrivateKey(object):
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)):
-            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+            raise ValueError("modulus and subgroup_order lengths must be "
                              "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
-            raise ValueError("Generator must be > 1 and < Prime Modulus")
+            raise ValueError("generator must be > 1 and < modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -137,12 +137,12 @@ class DSAPublicKey(object):
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)):
-            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+            raise ValueError("modulus and subgroup_order lengths must be "
                              "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
-            raise ValueError("Generator must be > 1 and < Prime Modulus")
+            raise ValueError("generator must be > 1 and < modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
