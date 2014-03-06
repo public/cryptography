@@ -53,10 +53,6 @@ class DSAParameters(object):
         self._subgroup_order = subgroup_order
         self._generator = generator
 
-    @classmethod
-    def generate(cls, key_size, backend):
-        return backend.generate_dsa_parameters(key_size)
-
     @property
     def modulus(self):
         return self._modulus
@@ -119,10 +115,6 @@ class DSAPrivateKey(object):
         self._generator = generator
         self._x = x
         self._y = y
-
-    @classmethod
-    def generate(cls, backend, parameters=None, key_size=None):
-        return backend.generate_dsa_private_key(parameters, key_size)
 
     @property
     def key_size(self):
