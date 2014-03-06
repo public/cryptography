@@ -18,6 +18,7 @@ import six
 from cryptography import utils
 from cryptography.hazmat.primitives import interfaces
 
+
 def _check_dsa_parameters(modulus, subgroup_order, generator):
         if (
             not isinstance(modulus, six.integer_types) or
@@ -37,6 +38,7 @@ def _check_dsa_parameters(modulus, subgroup_order, generator):
 
         if generator <= 1 or generator >= modulus:
             raise ValueError("generator must be > 1 and < modulus")
+
 
 @utils.register_interface(interfaces.DSAParameters)
 class DSAParameters(object):
