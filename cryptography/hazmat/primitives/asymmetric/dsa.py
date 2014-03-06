@@ -29,21 +29,13 @@ class DSAParameters(object):
         ):
             raise TypeError("DSAParameters arguments must be integers")
 
-        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
-            raise ValueError("Prime Modulus length must be 1024 or 2048 or"
-                             "3072 bits")
-
-        if utils.bit_length(subgroup_order) not in [160, 256]:
-            raise ValueError("Subgroup order length must be 160 or"
-                             "256 bits")
-
         if (utils.bit_length(modulus),
             utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
-            raise ValueError("Prime Modulus and Subgroup order lengths must be"
-                             "one of these pairs (1024, 160) or(2048, 256)"
+            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+                             "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
@@ -90,21 +82,13 @@ class DSAPrivateKey(object):
         ):
             raise TypeError("DSAPrivateKey arguments must be integers")
 
-        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
-            raise ValueError("Prime Modulus length must be 1024 or 2048 or"
-                             "3072 bits")
-
-        if utils.bit_length(subgroup_order) not in [160, 256]:
-            raise ValueError("Subgroup order length must be 160 or"
-                             "256 bits")
-
         if (utils.bit_length(modulus),
             utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
-            raise ValueError("Prime Modulus and Subgroup order lengths must be"
-                             "one of these pairs (1024, 160) or(2048, 256)"
+            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+                             "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
@@ -148,21 +132,13 @@ class DSAPublicKey(object):
         ):
             raise TypeError("DSAParameters arguments must be integers")
 
-        if utils.bit_length(modulus) not in [1024, 2048, 3072]:
-            raise ValueError("Prime Modulus length must be 1024 or 2048 or"
-                             "3072 bits")
-
-        if utils.bit_length(subgroup_order) not in [160, 256]:
-            raise ValueError("Subgroup order length must be 160 or"
-                             "256 bits")
-
         if (utils.bit_length(modulus),
             utils.bit_length(subgroup_order)) not in [
                 (1024, 160),
                 (2048, 256),
                 (3072, 256)]:
-            raise ValueError("Prime Modulus and Subgroup order lengths must be"
-                             "one of these pairs (1024, 160) or(2048, 256)"
+            raise ValueError("Prime Modulus and Subgroup order lengths must be "
+                             "one of these pairs (1024, 160) or(2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:
