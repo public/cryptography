@@ -84,6 +84,12 @@ class DSAPrivateKey(object):
         ):
             raise TypeError("DSAPrivateKey arguments must be integers")
 
+        if x <= 0 or x >= subgroup_order:
+            raise ValueError("x must be > 0 and < subgroup_order")
+
+        if y != (generator ** x) % modulus:
+            raise ValueError("y must be equal to (generator^x mod modulus)")
+
         self._modulus = modulus
         self._subgroup_order = subgroup_order
         self._generator = generator
