@@ -18,10 +18,7 @@ import six
 from cryptography import utils
 from cryptography.hazmat.primitives import interfaces
 
-
-@utils.register_interface(interfaces.DSAParameters)
-class DSAParameters(object):
-    def __init__(self, modulus, subgroup_order, generator):
+def _check_dsa_parameters(modulus, subgroup_order, generator):
         if (
             not isinstance(modulus, six.integer_types) or
             not isinstance(subgroup_order, six.integer_types) or
@@ -40,6 +37,11 @@ class DSAParameters(object):
 
         if generator <= 1 or generator >= modulus:
             raise ValueError("generator must be > 1 and < modulus")
+
+@utils.register_interface(interfaces.DSAParameters)
+class DSAParameters(object):
+    def __init__(self, modulus, subgroup_order, generator):
+        _check_dsa_parameters(modulus, subgroup_order, generator)
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -73,26 +75,12 @@ class DSAParameters(object):
 @utils.register_interface(interfaces.DSAPrivateKey)
 class DSAPrivateKey(object):
     def __init__(self, modulus, subgroup_order, generator, x, y):
+        _check_dsa_parameters(modulus, subgroup_order, generator)
         if (
-            not isinstance(modulus, six.integer_types) or
-            not isinstance(subgroup_order, six.integer_types) or
-            not isinstance(generator, six.integer_types) or
             not isinstance(x, six.integer_types) or
             not isinstance(y, six.integer_types)
         ):
             raise TypeError("DSAPrivateKey arguments must be integers")
-
-        if (utils.bit_length(modulus),
-            utils.bit_length(subgroup_order)) not in (
-                (1024, 160),
-                (2048, 256),
-                (3072, 256)):
-            raise ValueError("modulus and subgroup_order lengths must be "
-                             "one of these pairs (1024, 160) or(2048, 256) "
-                             "or (3072, 256)")
-
-        if generator <= 1 or generator >= modulus:
-            raise ValueError("generator must be > 1 and < modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -124,25 +112,11 @@ class DSAPrivateKey(object):
 @utils.register_interface(interfaces.DSAPublicKey)
 class DSAPublicKey(object):
     def __init__(self, modulus, subgroup_order, generator, y):
+        _check_dsa_parameters(modulus, subgroup_order, generator)
         if (
-            not isinstance(modulus, six.integer_types) or
-            not isinstance(subgroup_order, six.integer_types) or
-            not isinstance(generator, six.integer_types) or
             not isinstance(y, six.integer_types)
         ):
             raise TypeError("DSAParameters arguments must be integers")
-
-        if (utils.bit_length(modulus),
-            utils.bit_length(subgroup_order)) not in (
-                (1024, 160),
-                (2048, 256),
-                (3072, 256)):
-            raise ValueError("modulus and subgroup_order lengths must be "
-                             "one of these pairs (1024, 160) or(2048, 256) "
-                             "or (3072, 256)")
-
-        if generator <= 1 or generator >= modulus:
-            raise ValueError("generator must be > 1 and < modulus")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
