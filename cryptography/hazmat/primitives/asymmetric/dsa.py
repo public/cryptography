@@ -25,7 +25,7 @@ def _check_dsa_parameters(modulus, subgroup_order, generator):
             not isinstance(subgroup_order, six.integer_types) or
             not isinstance(generator, six.integer_types)
         ):
-            raise TypeError("DSAParameters arguments must be integers")
+            raise TypeError("DSA parameters must be integers")
 
         if (utils.bit_length(modulus),
             utils.bit_length(subgroup_order)) not in (
@@ -88,7 +88,7 @@ class DSAPrivateKey(object):
             raise ValueError("x must be > 0 and < subgroup_order")
 
         if y != (generator ** x) % modulus:
-            raise ValueError("y must be equal to (generator^x mod modulus)")
+            raise ValueError("y must be equal to (generator ** x mod modulus)")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -124,7 +124,7 @@ class DSAPublicKey(object):
         if (
             not isinstance(y, six.integer_types)
         ):
-            raise TypeError("DSAParameters arguments must be integers")
+            raise TypeError("DSAPublicKey arguments must be integers")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
