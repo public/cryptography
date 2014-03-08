@@ -16,8 +16,6 @@ from __future__ import absolute_import, division, print_function
 
 import pytest
 
-import random
-
 from cryptography.hazmat.primitives.asymmetric import dsa
 
 
@@ -38,103 +36,103 @@ class TestDSA(object):
         # Test a modulus < 1024 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1020),
-                subgroup_order=random.getrandbits(160),
-                generator=random.getrandbits(300)
+                modulus=2 ** 1000,
+                subgroup_order=2 ** 159,
+                generator=2 ** 300
             )
 
         # Test a modulus < 2048 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(2040),
-                subgroup_order=random.getrandbits(256),
-                generator=random.getrandbits(300)
+                modulus=2 ** 2000,
+                subgroup_order=2 ** 255,
+                generator=2 ** 300
             )
 
         # Test a modulus < 3072 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(3070),
-                subgroup_order=random.getrandbits(256),
-                generator=random.getrandbits(300)
+                modulus=2 ** 3000,
+                subgroup_order=2 ** 255,
+                generator=2 ** 300
             )
 
         # Test a modulus > 3072 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(3100),
-                subgroup_order=random.getrandbits(256),
-                generator=random.getrandbits(300)
+                modulus=2 ** 3100,
+                subgroup_order=2 ** 256,
+                generator=2 ** 300
             )
 
         # Test a subgroup_order < 160 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1024),
-                subgroup_order=random.getrandbits(150),
-                generator=random.getrandbits(300)
+                modulus=2 ** 1023,
+                subgroup_order=2 ** 150,
+                generator=2 ** 300
             )
 
         # Test a subgroup_order < 256 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(2048),
-                subgroup_order=random.getrandbits(250),
-                generator=random.getrandbits(300)
+                modulus=2 ** 2047,
+                subgroup_order=2 ** 250,
+                generator=2 ** 300
             )
 
         # Test a subgroup_order > 256 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(2048),
-                subgroup_order=random.getrandbits(260),
-                generator=random.getrandbits(300)
+                modulus=2 ** 2047,
+                subgroup_order=2 ** 260,
+                generator=2 ** 300
             )
 
         # Test a modulus, subgroup_order pair of (1024, 256) bit lengths
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1024),
-                subgroup_order=random.getrandbits(256),
-                generator=random.getrandbits(300)
+                modulus=2 ** 1023,
+                subgroup_order=2 ** 255,
+                generator=2 ** 300
             )
 
         # Test a modulus, subgroup_order pair of (2048, 160) bit lengths
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(2048),
-                subgroup_order=random.getrandbits(160),
-                generator=random.getrandbits(300)
+                modulus=2 ** 2047,
+                subgroup_order=2 ** 159,
+                generator=2 ** 300
             )
 
         # Test a modulus, subgroup_order pair of (3072, 160) bit lengths
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(3072),
-                subgroup_order=random.getrandbits(160),
-                generator=random.getrandbits(300)
+                modulus=2 ** 3071,
+                subgroup_order=2 ** 159,
+                generator=2 ** 300
             )
 
         # Test a generator < 1
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1024),
-                subgroup_order=random.getrandbits(160),
+                modulus=2 ** 1023,
+                subgroup_order=2 ** 159,
                 generator=0
             )
 
         # Test a generator = 1
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1024),
-                subgroup_order=random.getrandbits(160),
+                modulus=2 ** 1023,
+                subgroup_order=2 ** 159,
                 generator=1
             )
 
         # Test a generator > modulus
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=random.getrandbits(1024),
-                subgroup_order=random.getrandbits(160),
-                generator=random.getrandbits(2000)
+                modulus=2 ** 1023,
+                subgroup_order=2 ** 159,
+                generator=2 ** 1200
             )
