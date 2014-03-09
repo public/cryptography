@@ -33,7 +33,7 @@ def _check_dsa_parameters(modulus, subgroup_order, generator):
                 (2048, 256),
                 (3072, 256)):
             raise ValueError("modulus and subgroup_order lengths must be "
-                             "one of these pairs (1024, 160) or(2048, 256) "
+                             "one of these pairs (1024, 160) or (2048, 256) "
                              "or (3072, 256)")
 
         if generator <= 1 or generator >= modulus:

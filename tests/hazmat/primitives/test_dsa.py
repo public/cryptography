@@ -14,12 +14,24 @@
 
 from __future__ import absolute_import, division, print_function
 
+import os
+
 import pytest
 
 from cryptography.hazmat.primitives.asymmetric import dsa
 
+from ...utils import load_fips_dsa_vectors, load_vectors_from_file
+
 
 class TestDSA(object):
+    my_dict = load_vectors_from_file(
+        os.path.join(
+            "asymmetric", "DSA", "FIPS_186-3", "KeyPair.rsp",
+        ),
+        load_fips_dsa_vectors
+    )
+    _dict_1024, _dict_2048, _dict_3072 = my_dict
+
     def test_invalid_parameters_argument_types(self):
         with pytest.raises(TypeError):
             dsa.DSAParameters(None, None, None)
@@ -37,273 +49,102 @@ class TestDSA(object):
         with pytest.raises(ValueError):
             dsa.DSAParameters(
                 modulus=2 ** 1000,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300
+                subgroup_order=int(self._dict_1024['q'], 16),
+                generator=int(self._dict_1024['g'], 16)
             )
 
         # Test a modulus < 2048 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
                 modulus=2 ** 2000,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300
+                subgroup_order=int(self._dict_2048['q'], 16),
+                generator=int(self._dict_2048['g'], 16)
             )
 
         # Test a modulus < 3072 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
                 modulus=2 ** 3000,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300
+                subgroup_order=int(self._dict_3072['q'], 16),
+                generator=int(self._dict_3072['g'], 16)
             )
 
         # Test a modulus > 3072 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
                 modulus=2 ** 3100,
-                subgroup_order=2 ** 256,
-                generator=2 ** 300
+                subgroup_order=int(self._dict_3072['q'], 16),
+                generator=int(self._dict_3072['g'], 16)
             )
 
         # Test a subgroup_order < 160 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 1023,
+                modulus=int(self._dict_1024['p'], 16),
                 subgroup_order=2 ** 150,
-                generator=2 ** 300
+                generator=int(self._dict_1024['g'], 16)
             )
 
         # Test a subgroup_order < 256 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 2047,
+                modulus=int(self._dict_2048['p'], 16),
                 subgroup_order=2 ** 250,
-                generator=2 ** 300
+                generator=int(self._dict_2048['g'], 16)
             )
 
         # Test a subgroup_order > 256 bits in length
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 2047,
+                modulus=int(self._dict_3072['p'], 16),
                 subgroup_order=2 ** 260,
-                generator=2 ** 300
+                generator=int(self._dict_3072['g'], 16)
             )
 
         # Test a modulus, subgroup_order pair of (1024, 256) bit lengths
-        with pytest.raises(ValueError):
-            dsa.DSAParameters(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300
-            )
+        #with pytest.raises(ValueError):
+            #dsa.DSAParameters(
+                #modulus=int(self._dict_1024['p'], 16),
+                #subgroup_order=int(self._dict_3072['q'], 16),
+                #generator=int(self._dict_1024['g'], 16)
+            #)
 
         # Test a modulus, subgroup_order pair of (2048, 160) bit lengths
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 2047,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300
+                modulus=int(self._dict_2048['p'], 16),
+                subgroup_order=int(self._dict_1024['q'], 16),
+                generator=int(self._dict_2048['g'], 16)
             )
 
         # Test a modulus, subgroup_order pair of (3072, 160) bit lengths
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 3071,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300
+                modulus=int(self._dict_3072['p'], 16),
+                subgroup_order=int(self._dict_1024['q'], 16),
+                generator=int(self._dict_3072['g'], 16)
             )
 
         # Test a generator < 1
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
+                modulus=int(self._dict_1024['p'], 16),
+                subgroup_order=int(self._dict_1024['q'], 16),
                 generator=0
             )
 
         # Test a generator = 1
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
+                modulus=int(self._dict_1024['p'], 16),
+                subgroup_order=int(self._dict_1024['q'], 16),
                 generator=1
             )
 
         # Test a generator > modulus
         with pytest.raises(ValueError):
             dsa.DSAParameters(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
+                modulus=int(self._dict_1024['p'], 16),
+                subgroup_order=int(self._dict_1024['q'], 16),
                 generator=2 ** 1200
-            )
-
-    def test_invalid_private_key_argument_values(self):
-        # Test a modulus < 1024 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1000,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 1000)
-            )
-
-        # Test a modulus < 2048 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 2000,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 2000)
-            )
-
-        # Test a modulus < 3072 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 3000,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 3000)
-            )
-
-        # Test a modulus > 3072 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 3100,
-                subgroup_order=2 ** 256,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 3100)
-            )
-
-        # Test a subgroup_order < 160 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 150,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 1023)
-            )
-
-        # Test a subgroup_order < 256 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 2047,
-                subgroup_order=2 ** 250,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 2047)
-            )
-
-        # Test a subgroup_order > 256 bits in length
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 2047,
-                subgroup_order=2 ** 260,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 2047)
-            )
-
-        # Test a modulus, subgroup_order pair of (1024, 256) bit lengths
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 255,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 1023)
-            )
-
-        # Test a modulus, subgroup_order pair of (2048, 160) bit lengths
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 2047,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 2047)
-            )
-
-        # Test a modulus, subgroup_order pair of (3072, 160) bit lengths
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 3071,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=((2 ** 300) ** (2 ** 100)) % (2 ** 3071)
-            )
-
-        # Test a generator < 1
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=0,
-                x=2 ** 100,
-                y=0
-            )
-
-        # Test a generator = 1
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=1,
-                x=2 ** 100,
-                y=(1 ** (2 ** 100)) % (2 ** 1023)
-            )
-
-        # Test a generator > modulus
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=2 ** 1200,
-                x=2 ** 100,
-                y=((2 ** 1200) ** (2 ** 100)) % (2 ** 1023)
-            )
-
-        # Test x < 0
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=-2,
-                y=((2 ** 300) ** (-2)) % (2 ** 1023)
-            )
-
-        # Test x = 0
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=0,
-                y=(1) % (2 ** 1023)
-            )
-
-        # Test x > subgroup_order
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=2 ** 200,
-                y=((2 ** 300) ** (2 ** 200)) % (2 ** 1023)
-            )
-
-        # Test y != (generator ** x) % modulus:
-        with pytest.raises(ValueError):
-            dsa.DSAPrivateKey(
-                modulus=2 ** 1023,
-                subgroup_order=2 ** 159,
-                generator=2 ** 300,
-                x=2 ** 100,
-                y=2 ** 100
             )
