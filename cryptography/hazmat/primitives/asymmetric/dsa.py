@@ -88,7 +88,7 @@ class DSAPrivateKey(object):
             raise ValueError("x must be > 0 and < subgroup_order")
 
         if y != (generator ** x) % modulus:
-            raise ValueError("y must be equal to (generator ** x mod modulus)")
+            raise ValueError("y must be equal to (generator ** x % modulus)")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
@@ -121,10 +121,8 @@ class DSAPrivateKey(object):
 class DSAPublicKey(object):
     def __init__(self, modulus, subgroup_order, generator, y):
         _check_dsa_parameters(modulus, subgroup_order, generator)
-        if (
-            not isinstance(y, six.integer_types)
-        ):
-            raise TypeError("DSAPublicKey arguments must be integers")
+        if not isinstance(y, six.integer_types):
+            raise TypeError("y must be an integer")
 
         self._modulus = modulus
         self._subgroup_order = subgroup_order
