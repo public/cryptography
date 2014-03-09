@@ -102,12 +102,12 @@ class TestDSA(object):
             )
 
         # Test a modulus, subgroup_order pair of (1024, 256) bit lengths
-        #with pytest.raises(ValueError):
-            #dsa.DSAParameters(
-                #modulus=int(self._dict_1024['p'], 16),
-                #subgroup_order=int(self._dict_3072['q'], 16),
-                #generator=int(self._dict_1024['g'], 16)
-            #)
+        with pytest.raises(ValueError):
+            dsa.DSAParameters(
+                modulus=int(self._dict_1024['p'], 16),
+                subgroup_order=int(self._dict_2048['q'], 16),
+                generator=int(self._dict_1024['g'], 16)
+            )
 
         # Test a modulus, subgroup_order pair of (2048, 160) bit lengths
         with pytest.raises(ValueError):
