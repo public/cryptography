@@ -87,7 +87,7 @@ class DSAPrivateKey(object):
         if x <= 0 or x >= subgroup_order:
             raise ValueError("x must be > 0 and < subgroup_order")
 
-        if y != (generator ** x) % modulus:
+        if y != pow(generator, x, modulus):
             raise ValueError("y must be equal to (generator ** x % modulus)")
 
         self._modulus = modulus
