@@ -13,13 +13,17 @@
 
 from __future__ import absolute_import, division, print_function
 
-import six
-
 import pytest
 
-from cryptography.exceptions import AlreadyFinalized, InvalidKey
+import six
+
+from cryptography.exceptions import (
+    AlreadyFinalized, InvalidKey, _Reasons
+)
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+
+from ...utils import raises_unsupported_algorithm
 
 
 @pytest.mark.hmac
@@ -145,3 +149,10 @@ class TestHKDF(object):
             )
 
             hkdf.verify(b"foo", six.u("bar"))
+
+
+def test_invalid_backend():
+    pretend_backend = object()
+
+    with raises_unsupported_algorithm(_Reasons.BACKEND_MISSING_INTERFACE):
+        HKDF(hashes.SHA256(), 16, None, None, pretend_backend)

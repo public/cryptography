@@ -21,7 +21,7 @@ import invoke
 import requests
 
 
-JENKINS_URL = "http://jenkins.cryptography.io/job/cryptography-wheel-builder"
+JENKINS_URL = "https://jenkins.cryptography.io/job/cryptography-wheel-builder"
 
 
 def wait_for_build_completed():
@@ -84,7 +84,12 @@ def release(version):
     invoke.run("git push --tags")
 
     invoke.run("python setup.py sdist")
-    invoke.run("twine upload -s dist/cryptography-{0}*".format(version))
+    invoke.run("cd vectors/ && python setup.py sdist bdist_wheel")
+
+    invoke.run(
+        "twine upload -s dist/cryptography-{0}* "
+        "vectors/dist/cryptography_vectors-{0}*".format(version)
+    )
 
     token = getpass.getpass("Input the Jenkins token: ")
     response = requests.post(

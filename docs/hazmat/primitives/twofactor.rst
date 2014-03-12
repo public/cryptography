@@ -1,6 +1,6 @@
 .. hazmat::
 
-Two-factor Authentication
+Two-factor authentication
 =========================
 
 .. currentmodule:: cryptography.hazmat.primitives.twofactor
@@ -52,6 +52,9 @@ codes (HMAC).
         :class:`~cryptography.hazmat.primitives.hashes.SHA256()` or
         :class:`~cryptography.hazmat.primitives.hashes.SHA512()` or if the
         ``length`` parameter is not an integer.
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.HMACBackend`
 
     .. method:: generate(counter)
 
@@ -76,7 +79,7 @@ locks out the account for a period of time after a number of failed attempts.
 The number of allowed attempts should be as low as possible while still
 ensuring that usability is not significantly impacted.
 
-Re-synchronization of the Counter
+Re-synchronization of the counter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The server's counter value should only be incremented on a successful HOTP
@@ -148,6 +151,9 @@ similar to the following code.
         :class:`~cryptography.hazmat.primitives.hashes.SHA256()` or
         :class:`~cryptography.hazmat.primitives.hashes.SHA512()` or if the
         ``length`` parameter is not an integer.
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.HMACBackend`
 
     .. method:: generate(time)
 

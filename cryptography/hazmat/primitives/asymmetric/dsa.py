@@ -130,6 +130,10 @@ class DSAPublicKey(object):
         self._y = y
 
     @property
+    def key_size(self):
+        return utils.bit_length(self._modulus)
+
+    @property
     def y(self):
         return self._y
 

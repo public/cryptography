@@ -19,6 +19,40 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric import dsa
 
 
+def _check_dsa_private_key(skey):
+    assert skey
+    assert skey.x
+    assert skey.y
+    assert skey.key_size
+
+    skey_parameters = skey.parameters()
+    assert skey_parameters
+    assert skey_parameters.modulus
+    assert skey_parameters.subgroup_order
+    assert skey_parameters.generator
+    assert skey_parameters.modulus == skey_parameters.p
+    assert skey_parameters.subgroup_order == skey_parameters.q
+    assert skey_parameters.generator == skey_parameters.g
+
+    pkey = skey.public_key()
+    assert pkey
+    assert skey.y == pkey.y
+    assert skey.key_size == pkey.key_size
+
+    pkey_parameters = pkey.parameters()
+    assert pkey_parameters
+    assert pkey_parameters.modulus
+    assert pkey_parameters.subgroup_order
+    assert pkey_parameters.generator
+    assert pkey_parameters.modulus == pkey_parameters.p
+    assert pkey_parameters.subgroup_order == pkey_parameters.q
+    assert pkey_parameters.generator == pkey_parameters.g
+
+    assert skey_parameters.modulus == pkey_parameters.modulus
+    assert skey_parameters.subgroup_order == pkey_parameters.subgroup_order
+    assert skey_parameters.generator == pkey_parameters.generator
+
+
 class TestDSA(object):
     _dict_1024 = {
         'p': 'd38311e2cd388c3ed698e82fdf88eb92b5a9a483dc88005d4b725ef341eabb47'
@@ -134,6 +168,56 @@ class TestDSA(object):
     def test_invalid_public_key_argument_types(self):
         with pytest.raises(TypeError):
             dsa.DSAPublicKey(None, None, None, None)
+
+    def test_load_dsa_example_keys(self):
+        skey = dsa.DSAPrivateKey(
+            modulus=int(self._dict_1024["p"], 16),
+            subgroup_order=int(self._dict_1024["q"], 16),
+            generator=int(self._dict_1024["g"], 16),
+            x=int(self._dict_1024["x"], 16),
+            y=int(self._dict_1024["y"], 16)
+        )
+        assert skey
+        _check_dsa_private_key(skey)
+        skey_parameters = skey.parameters()
+        assert skey_parameters
+        assert skey_parameters.modulus
+        assert skey_parameters.subgroup_order
+        assert skey_parameters.generator
+
+        pkey = dsa.DSAPublicKey(
+            modulus=int(self._dict_1024["p"], 16),
+            subgroup_order=int(self._dict_1024["q"], 16),
+            generator=int(self._dict_1024["g"], 16),
+            y=int(self._dict_1024["y"], 16)
+        )
+        assert pkey
+        pkey_parameters = pkey.parameters()
+        assert pkey_parameters
+        assert pkey_parameters.modulus
+        assert pkey_parameters.subgroup_order
+        assert pkey_parameters.generator
+
+        pkey2 = skey.public_key()
+        assert pkey2
+        pkey2_parameters = pkey.parameters()
+        assert pkey2_parameters
+        assert pkey2_parameters.modulus
+        assert pkey2_parameters.subgroup_order
+        assert pkey2_parameters.generator
+
+        assert skey_parameters.modulus == pkey_parameters.modulus
+        assert skey_parameters.subgroup_order == pkey_parameters.subgroup_order
+        assert skey_parameters.generator == pkey_parameters.generator
+        assert skey.y == pkey.y
+        assert skey.key_size == pkey.key_size
+
+        assert pkey_parameters.modulus == pkey2_parameters.modulus
+        assert pkey_parameters.subgroup_order == \
+            pkey2_parameters.subgroup_order
+        assert pkey_parameters.generator == pkey2_parameters.generator
+        assert pkey.y == pkey2.y
+        assert pkey.key_size == pkey2.key_size
 
     def test_invalid_parameters_values(self):
         # Test a modulus < 1024 bits in length

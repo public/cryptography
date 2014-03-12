@@ -1,6 +1,6 @@
 .. hazmat::
 
-Key Derivation Functions
+Key derivation functions
 ========================
 
 .. currentmodule:: cryptography.hazmat.primitives.kdf
@@ -83,6 +83,10 @@ Different KDFs are suitable for different tasks such as:
     :param backend: A
         :class:`~cryptography.hazmat.backends.interfaces.PBKDF2HMACBackend`
         provider.
+
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.PBKDF2HMACBackend`
 
     .. method:: derive(key_material)
 
@@ -182,6 +186,10 @@ Different KDFs are suitable for different tasks such as:
     :param backend: A
         :class:`~cryptography.hazmat.backends.interfaces.HMACBackend`
         provider.
+
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.HMACBackend`
 
     .. method:: derive(key_material)
 

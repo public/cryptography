@@ -41,6 +41,8 @@ static const long Cryptography_HAS_OP_NO_COMPRESSION;
 static const long Cryptography_HAS_SSL_OP_MSIE_SSLV2_RSA_PADDING;
 static const long Cryptography_HAS_SSL_SET_SSL_CTX;
 static const long Cryptography_HAS_SSL_OP_NO_TICKET;
+static const long Cryptography_HAS_NETBSD_D1_METH;
+static const long Cryptography_HAS_NEXTPROTONEG;
 
 static const long SSL_FILETYPE_PEM;
 static const long SSL_FILETYPE_ASN1;
@@ -123,7 +125,11 @@ typedef ... X509_STORE_CTX;
 static const long X509_V_OK;
 static const long X509_V_ERR_APPLICATION_VERIFICATION;
 typedef ... SSL_METHOD;
-typedef ... SSL_CTX;
+typedef struct ssl_st {
+    int version;
+    int type;
+    ...;
+} SSL_CTX;
 
 typedef struct {
     int master_key_length;
@@ -313,6 +319,31 @@ void (*SSL_CTX_get_info_callback(SSL_CTX *))(const SSL *, int, int);
 /* This function does not exist in 0.9.8e. Once we drop support for
    RHEL/CentOS 5 this can be moved back to FUNCTIONS. */
 SSL_CTX *SSL_set_SSL_CTX(SSL *, SSL_CTX *);
+
+const SSL_METHOD* Cryptography_SSL_CTX_get_method(const SSL_CTX*);
+
+/* NPN APIs were introduced in OpenSSL 1.0.1.  To continue to support earlier
+ * versions some special handling of these is necessary.
+ */
+void SSL_CTX_set_next_protos_advertised_cb(SSL_CTX *,
+                                           int (*)(SSL *,
+                                                   const unsigned char **,
+                                                   unsigned int *,
+                                                   void *),
+                                           void *);
+void SSL_CTX_set_next_proto_select_cb(SSL_CTX *,
+                                      int (*)(SSL *,
+                                              unsigned char **,
+                                              unsigned char *,
+                                              const unsigned char *,
+                                              unsigned int,
+                                              void *),
+                                      void *);
+int SSL_select_next_proto(unsigned char **, unsigned char *,
+                          const unsigned char *, unsigned int,
+                          const unsigned char *, unsigned int);
+void SSL_get0_next_proto_negotiated(const SSL *,
+                                    const unsigned char **, unsigned *);
 """
 
 CUSTOMIZATIONS = """
@@ -396,6 +427,60 @@ static const long Cryptography_HAS_SSL_SET_SSL_CTX = 0;
 static const long TLSEXT_NAMETYPE_host_name = 0;
 SSL_CTX *(*SSL_set_SSL_CTX)(SSL *, SSL_CTX *) = NULL;
 #endif
+
+/* NetBSD shipped without including d1_meth.c. This workaround checks to see
+   if the version of NetBSD we're currently running on is old enough to
+   have the bug and provides an empty implementation so we can link and
+   then remove the function from the ffi object. */
+#ifdef __NetBSD__
+#  include <sys/param.h>
+#  if (__NetBSD_Version__ < 699003800)
+static const long Cryptography_HAS_NETBSD_D1_METH = 0;
+const SSL_METHOD *DTLSv1_method(void) {
+    return NULL;
+}
+#  else
+static const long Cryptography_HAS_NETBSD_D1_METH = 1;
+#  endif
+#else
+static const long Cryptography_HAS_NETBSD_D1_METH = 1;
+#endif
+
+// Workaround for #794 caused by cffi const** bug.
+const SSL_METHOD* Cryptography_SSL_CTX_get_method(const SSL_CTX* ctx) {
+    return ctx->method;
+}
+
+/* Because OPENSSL defines macros that claim lack of support for things, rather
+ * than macros that claim support for things, we need to do a version check in
+ * addition to a definition check. NPN was added in 1.0.1: for any version
+ * before that, there is no compatibility.
+ */
+#if defined(OPENSSL_NO_NEXTPROTONEG) || OPENSSL_VERSION_NUMBER < 0x1000100fL
+static const long Cryptography_HAS_NEXTPROTONEG = 0;
+void (*SSL_CTX_set_next_protos_advertised_cb)(SSL_CTX *,
+                                              int (*)(SSL *,
+                                                      const unsigned char **,
+                                                      unsigned int *,
+                                                      void *),
+                                              void *) = NULL;
+void (*SSL_CTX_set_next_proto_select_cb)(SSL_CTX *,
+                                         int (*)(SSL *,
+                                                 unsigned char **,
+                                                 unsigned char *,
+                                                 const unsigned char *,
+                                                 unsigned int,
+                                                 void *),
+                                         void *) = NULL;
+int (*SSL_select_next_proto)(unsigned char **, unsigned char *,
+                             const unsigned char *, unsigned int,
+                             const unsigned char *, unsigned int) = NULL;
+void (*SSL_get0_next_proto_negotiated)(const SSL *,
+                                       const unsigned char **,
+                                       unsigned *) = NULL;
+#else
+static const long Cryptography_HAS_NEXTPROTONEG = 1;
+#endif
 """
 
 CONDITIONAL_NAMES = {
@@ -449,4 +534,15 @@ CONDITIONAL_NAMES = {
         "SSL_set_SSL_CTX",
         "TLSEXT_NAMETYPE_host_name",
     ],
+
+    "Cryptography_HAS_NETBSD_D1_METH": [
+        "DTLSv1_method",
+    ],
+
+    "Cryptography_HAS_NEXTPROTONEG": [
+        "SSL_CTX_set_next_protos_advertised_cb",
+        "SSL_CTX_set_next_proto_select_cb",
+        "SSL_select_next_proto",
+        "SSL_get0_next_proto_negotiated",
+    ]
 }

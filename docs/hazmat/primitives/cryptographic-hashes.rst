@@ -1,6 +1,6 @@
 .. hazmat::
 
-Message Digests
+Message digests
 ===============
 
 .. currentmodule:: cryptography.hazmat.primitives.hashes
@@ -29,7 +29,8 @@ Message Digests
         'l\xa1=R\xcap\xc8\x83\xe0\xf0\xbb\x10\x1eBZ\x89\xe8bM\xe5\x1d\xb2\xd29%\x93\xafj\x84\x11\x80\x90'
 
     If the backend doesn't support the requested ``algorithm`` an
-    :class:`~cryptography.exceptions.UnsupportedHash` exception will be raised.
+    :class:`~cryptography.exceptions.UnsupportedAlgorithm` exception will be
+    raised.
 
     Keep in mind that attacks against cryptographic hashes only get stronger
     with time, and that often algorithms that were once thought to be strong,
@@ -44,6 +45,10 @@ Message Digests
     :param backend: A
         :class:`~cryptography.hazmat.backends.interfaces.HashBackend`
         provider.
+
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.HashBackend`
 
     .. method:: update(data)
 
@@ -86,7 +91,7 @@ SHA-1
     SHA-1 is a cryptographic hash function standardized by NIST. It produces an
     160-bit message digest.
 
-SHA-2 Family
+SHA-2 family
 ~~~~~~~~~~~~
 
 .. class:: SHA224()

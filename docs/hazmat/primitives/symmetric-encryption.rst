@@ -1,7 +1,7 @@
 .. hazmat:: /fernet
 
 
-Symmetric Encryption
+Symmetric encryption
 ====================
 
 .. currentmodule:: cryptography.hazmat.primitives.ciphers
@@ -56,6 +56,10 @@ an "encrypt-then-MAC" formulation as `described by Colin Percival`_.
         :class:`~cryptography.hazmat.backends.interfaces.CipherBackend`
         provider.
 
+    :raises cryptography.exceptions.UnsupportedAlgorithm: This is raised if the
+        provided ``backend`` does not implement
+        :class:`~cryptography.hazmat.backends.interfaces.CipherBackend`
+
     .. method:: encryptor()
 
         :return: An encrypting
@@ -63,7 +67,7 @@ an "encrypt-then-MAC" formulation as `described by Colin Percival`_.
             provider.
 
         If the backend doesn't support the requested combination of ``cipher``
-        and ``mode`` an :class:`~cryptography.exceptions.UnsupportedCipher`
+        and ``mode`` an :class:`~cryptography.exceptions.UnsupportedAlgorithm`
         exception will be raised.
 
     .. method:: decryptor()
@@ -73,7 +77,7 @@ an "encrypt-then-MAC" formulation as `described by Colin Percival`_.
             provider.
 
         If the backend doesn't support the requested combination of ``cipher``
-        and ``mode`` an :class:`cryptography.exceptions.UnsupportedCipher`
+        and ``mode`` an :class:`cryptography.exceptions.UnsupportedAlgorithm`
         exception will be raised.
 
 .. _symmetric-encryption-algorithms:
@@ -126,7 +130,7 @@ Algorithms
     :param bytes key: The secret key, This must be kept secret. 40 to 128 bits
         in length in increments of 8 bits.
 
-Weak Ciphers
+Weak ciphers
 ------------
 
 .. warning::
@@ -164,6 +168,16 @@ Weak Ciphers
         >>> decryptor = cipher.decryptor()
         >>> decryptor.update(ct)
         'a secret message'
+
+.. class:: IDEA(key)
+
+    IDEA (`International Data Encryption Algorithm`_) is a block cipher created
+    in 1991. It is an optional component of the `OpenPGP`_ standard. This cipher
+    is susceptible to attacks when using weak keys. It is recommended that you
+    do not use this cipher for new applications.
+
+    :param bytes key: The secret key This must be kept secret. ``128`` bits in
+        length.
 
 
 .. _symmetric-encryption-modes:
@@ -358,7 +372,7 @@ Modes
         a secret message!
 
 
-Insecure Modes
+Insecure modes
 --------------
 
 .. warning::
@@ -468,3 +482,5 @@ Interfaces
 .. _`encrypt`: https://ssd.eff.org/tech/encryption
 .. _`CRYPTREC`: http://www.cryptrec.go.jp/english/
 .. _`significant patterns in the output`: http://en.wikipedia.org/wiki/Cipher_block_chaining#Electronic_codebook_.28ECB.29
+.. _`International Data Encryption Algorithm`: https://en.wikipedia.org/wiki/International_Data_Encryption_Algorithm
+.. _`OpenPGP`: http://www.openpgp.org
