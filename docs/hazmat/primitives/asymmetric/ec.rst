@@ -205,6 +205,12 @@ generation process.
     SECG curve ``secp384r1``. Also called NIST P-384.
 
 
+.. class:: SECP256K1
+    .. versionadded:: 0.5
+
+    SECG curve ``secp256k1``. Notable as the `curve used by Bitcoin`_.
+
+
 .. class:: SECP256R1
     .. versionadded:: 0.5
 
@@ -227,3 +233,4 @@ generation process.
 .. _`FIPS 186-3`: http://csrc.nist.gov/publications/fips/fips186-3/fips_186-3.pdf
 .. _`FIPS 186-4`: http://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.186-4.pdf
 .. _`some concern`: https://crypto.stackexchange.com/questions/10263/should-we-trust-the-nist-recommended-ecc-parameters
+.. _`curve used by Bitcoin`: https://en.bitcoin.it/wiki/Secp256k1

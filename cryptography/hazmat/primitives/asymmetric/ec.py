@@ -152,6 +152,17 @@ class SECP384R1(object):
 
 
 @utils.register_interface(interfaces.EllipticCurve)
+class SECP256K1(object):
+    @property
+    def name(self):
+        return "secp256k1"
+
+    @property
+    def key_size(self):
+        return 256
+
+
+@utils.register_interface(interfaces.EllipticCurve)
 class SECP256R1(object):
     @property
     def name(self):
